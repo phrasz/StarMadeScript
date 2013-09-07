@@ -1,7 +1,7 @@
 Automated StarMade Server Script for Ubuntu
 ===========================================
 So I've been meaning to finally write this thing up, and had some down time this weekend.
-I've been running a Minecraft/Bukkit server for YEARS, and had been leeching this awesome script to have it automate starting/stoping/saving/etc, and doing this automatically with the startup and shutdown proceedures of Ubuntu Server.
+I've been running a Minecraft/Bukkit server for YEARS, and had been leeching this awesome Minecraft script to have it automate starting/stoping/saving/etc, and doing this automatically with the startup and shutdown proceedures of Ubuntu Server.
 
 The following is a quick and dirty way to get this script up and running on Ubuntu Server 12.04 x64 with Oracle's Java JRE preinstalled.
 However, this thing should run on anything with bash (run `ls /bin/ | grep bash` to check), *a version of java* (Oracle vs. Open JRE), and screen.
@@ -11,7 +11,7 @@ Hopefully someone else can use this!
 A Forward Apology
 -----------------
 Unfortunately, this document does not cover "How to get a StarMade server running, with a FAQ to boot".
-I've tried to add a quick and dirty way to get you running a server (with links from the wild), BUT there is still a large portion of linux server management mission (like 99% of it: portforwarding, firewalling, permissions, automated cron services, automated backup, pushing servers to EC2... etc, etc).
+I've tried to add a quick and dirty way to get you running a server (with links from the wild), BUT there is still a large portion of linux server management missing (like 99% of it: portforwarding, firewalling, permissions, automated cron services, automated backup, pushing servers to EC2... etc, etc).
 I'd encourage you to scour the Internet as I have over my years, and learn what the heck is going on!
 
 Dependencies
@@ -44,7 +44,7 @@ Linux PreciseServer 3.5.0-40-generic #62~precise1-Ubuntu SMP Fri Aug 23 17:38:26
 ```
 Java:
 ```bash
-$java -version
+$ java -version
 
 java version "1.7.0_25"
 Java(TM) SE Runtime Environment (build 1.7.0_25-b15)
@@ -53,7 +53,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 23.25-b01, mixed mode)
 
 Screen:
 ```bash
-$screen -v
+$ screen -v
 
 Screen version 4.00.03jw4 (FAU) 2-May-06
 ```
@@ -68,7 +68,7 @@ A Quick Note on Installing Software
 > The easiest solution is running: `sudo apt-get install openjdk-jre`.
 > However, I normally use Oracle's, so [maybe something like this helps](http://www.cyberciti.biz/faq/howto-installing-oracle-java7-on-ubuntu-linux/)
 
-> As for what I do: Look at the cyberciti link through downloading, skip the "update alternatives" buiness, place/extract it in /opt/..., and definately update ~/.bashrc with the modifications they do in that link.
+>> As for what I do: Look at the cyberciti link through downloading, skip the "update alternatives" buiness, place/extract it in /opt/..., and definately update ~/.bashrc with the modifications they do in that link.
 
 3. Install Screen
 > This is the easiest one: `sudo apt-get install screen`
@@ -106,6 +106,7 @@ INVOCATION="java -Xmx${MAXHEAP}M -Xms${MINHEAP}M -jar $SERVICE $OPTIONS"
 WEBSITE="http://files.star-made.org/"
 FILE="StarMade-Starter.jar"
 **JAVABINFOLDER="/opt/java/jdk1.7.0_25/bin" #no trailing / !**<----change you your Java path (aka run the command 'which  java')
+```
 
 A Note on the Server's location
 -------------------------------
