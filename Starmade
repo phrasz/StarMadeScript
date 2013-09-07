@@ -1,0 +1,164 @@
+#!/bin/bash
+# /etc/init.d/Starmade
+
+# Credits
+# Shoutout to MinecraftWiki.net
+# This script has been modified from: http://www.minecraftwiki.net/wiki/Tutorials/Server_startup_script
+
+#License
+# Also I have to license this under: CC BY-NC-SA 3.0
+# More here: http://creativecommons.org/licenses/by-nc-sa/3.0/us/
+
+# version 0.1 2013-09-07 (YYYY-MM-DD)
+
+### BEGIN INIT INFO
+# Provides:   Starmade
+# Required-Start: $local_fs $remote_fs
+# Required-Stop:  $local_fs $remote_fs
+# Should-Start:   $network
+# Should-Stop:    $network
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description:    StarMade server
+# Description:    Starts the starmade server
+### END INIT INFO
+
+# Install autostarting server on Ubuntu:
+# sudo cp Starmade /etc/init.d/
+# sudo update-rc.d Starmade defaults
+
+# Uninstall on Ubuntu
+# sudo update-rc.d -f Starmade remove
+
+#System Settings
+SERVICE='StarMade.jar'
+OPTIONS='-server'
+USERNAME='phrasz'
+ScreenName='StarMade'
+STARMADEPATH='/srv/starmade/StarMade'
+
+#Server Run Settings
+HISTORY=1024
+MAXHEAP=1200
+MINHEAP=768
+INVOCATION="java -Xmx${MAXHEAP}M -Xms${MINHEAP}M -jar $SERVICE $OPTIONS"
+
+#Update Links/Names
+WEBSITE="http://files.star-made.org/"
+FILE="StarMade-Starter.jar"
+JAVABINFOLDER="/opt/java/jdk1.7.0_25/bin" #no trailing / !
+
+ME=`whoami`
+as_user() {
+  if [ $ME == $USERNAME ] ; then
+    bash -c "$1"
+  else
+    su - $USERNAME -c "$1"
+  fi
+}
+
+sm_start() {
+    cd $STARMADEPATH
+    as_user "screen -h $HISTORY -dmS $ScreenName"
+    as_user "screen -p 0 -S $ScreenName -X eval 'stuff \"cd $STARMADEPATH && $INVOCATION\"\015'"
+    echo "$SERVICE started!"
+
+}
+
+sm_save() {
+  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  then
+    echo "$SERVICE is running... force saving"
+    as_user "screen -p 0 -S $ScreenName -X eval 'stuff \"/force_save\"\015'"
+  else
+    echo "$SERVICE is not running. Cannot save."
+  fi
+}
+
+sm_update() {
+  cd $STARMADEPATH/..
+  wget -N $WEBSITE$FILE
+  chmod 777 $FILE
+  $JAVABINFOLDER/java -jar $FILE -nogui
+  #sudo -u $USERNAME java -jar $FILE -nogui
+  cd $STARMADEPATH
+  chmod 777 * -R
+}
+
+sm_stop() {
+  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  then
+    echo "$SERVICE is running... shutting down servert"
+    as_user "screen -p 0 -S $ScreenName -X eval 'stuff \"/shutdown 1\"\015'"
+    as_user "screen -p 0 -S $ScreenName -X eval 'stuff \"exit\"\015'"
+  else
+    echo "$SERVICE is not running, no need to stop."
+  fi
+}
+
+
+sm_command() {
+  command="$1";
+  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  then
+    pre_log_len=`wc -l "$STARMADEPATH/logs/log.txt.0" | awk '{print $1}'`
+    echo "$SERVICE is running... executing command"
+    as_user "screen -p 0 -S $ScreenName -X eval 'stuff \"/$command\"\015'"
+    sleep .5
+    tail -n $[`wc -l "$STARMADEPATH/logs/log.txt.0" | awk '{print $1}'`-$pre_log_len] "$STARMADEPATH/logs/log.txt.0"
+  fi
+}
+
+#Start-Stop here
+case "$1" in
+  start)
+    sm_start
+    ;;
+  save)
+    sm_save
+    ;;
+  stop)
+    sm_save
+    sm_stop
+    ;;
+  restart)
+    sm_save
+    sm_stop
+    sm_start
+    ;;
+  update)
+    if pgrep -u $USERNAME -f $SERVICE > /dev/null
+    then
+      echo "$SERVICE is running...saving, shutting down, and updating"
+      sm_save
+      sm_stop
+      sm_update
+      sm_start
+    else
+      echo "$SERVICE is not running... proceeding with update."
+      sm_update
+    fi
+    ;;
+  status)
+    if pgrep -u $USERNAME -f $SERVICE > /dev/null
+    then
+      echo "$SERVICE is running."
+    else
+      echo "$SERVICE is not running."
+    fi
+    ;;
+  command)
+    if [ $# -gt 1 ]; then
+      shift
+      sm_command "$*"
+    else
+      echo "Must specify server command (try 'help'?)"
+    fi
+    ;;
+  *)
+  echo "Usage: $0 {start|save|stop|status|restart|update|command \"server command\"}"
+  exit 1
+  ;;
+esac
+
+exit 0

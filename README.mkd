@@ -1,0 +1,156 @@
+Automated StarMade Server Script for Ubuntu
+===========================================
+So I've been meaning to finally write this thing up, and had some down time this weekend.
+I've been running a Minecraft/Bukkit server for YEARS, and had been leeching this awesome script to have it automate starting/stoping/saving/etc, and doing this automatically with the startup and shutdown proceedures of Ubuntu Server.
+
+The following is a quick and dirty way to get this script up and running on Ubuntu Server 12.04 x64 with Oracle's Java JRE preinstalled.
+However, this thing should run on anything with bash (run `ls /bin/ | grep bash` to check), *a version of java* (Oracle vs. Open JRE), and screen.
+
+Hopefully someone else can use this!
+
+A Forward Apology
+-----------------
+Unfortunately, this document does not cover "How to get a StarMade server running, with a FAQ to boot".
+I've tried to add a quick and dirty way to get you running a server (with links from the wild), BUT there is still a large portion of linux server management mission (like 99% of it: portforwarding, firewalling, permissions, automated cron services, automated backup, pushing servers to EC2... etc, etc).
+I'd encourage you to scour the Internet as I have over my years, and learn what the heck is going on!
+
+Dependencies
+------------
+1. Bash
+2. Java (installed)
+3. Screen (installed)
+4. A folder named "StarMade" for server execution, with write permissions in its parent directory [FOR UPDATING ONLY!]
+
+Software Versions Used
+----------------------
+Ubuntu:
+```bash
+$ cat /etc/*-release
+
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=12.04
+DISTRIB_CODENAME=precise
+DISTRIB_DESCRIPTION="Ubuntu 12.04.3 LTS"
+NAME="Ubuntu"
+VERSION="12.04.3 LTS, Precise Pangolin"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu precise (12.04.3 LTS)"
+VERSION_ID="12.04"
+
+$ uname -a
+
+Linux PreciseServer 3.5.0-40-generic #62~precise1-Ubuntu SMP Fri Aug 23 17:38:26 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
+```
+Java:
+```bash
+$java -version
+
+java version "1.7.0_25"
+Java(TM) SE Runtime Environment (build 1.7.0_25-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 23.25-b01, mixed mode)
+```
+
+Screen:
+```bash
+$screen -v
+
+Screen version 4.00.03jw4 (FAU) 2-May-06
+```
+
+A Quick Note on Installing Software
+-----------------------------------
+1. Getting Ubuntu Running
+> If you want to run a server you can test it out with [VirtualBox]() and [Ubuntu 12.04]().
+> I did Google a link and [Gizmo Junkee has it covered!](http://www.gizmojunkee.com/2012/05/ubuntu-12-04-lte-server-on-virtualbox-4-1/)
+
+2. Installing Java
+> The easiest solution is running: `sudo apt-get install openjdk-jre`.
+> However, I normally use Oracle's, so [maybe something like this helps](http://www.cyberciti.biz/faq/howto-installing-oracle-java7-on-ubuntu-linux/)
+
+> As for what I do: Look at the cyberciti link through downloading, skip the "update alternatives" buiness, place/extract it in /opt/..., and definately update ~/.bashrc with the modifications they do in that link.
+
+3. Install Screen
+> This is the easiest one: `sudo apt-get install screen`
+
+How to Copy this Script to your Server
+--------------------------------------
+Run the following command:
+```bash
+wget https://raw.github.com/phrasz/StarMadeScript/master/Starmade
+```
+
+A Note on Configuration
+-----------------------
+These are the default settings of this script as I run it on my server.
+
+I have double stared the MINIMUM settings to change in the Starmade file.
+If you don't change these settings the script won't work...
+
+###Script Settings:
+```bash
+#System Settings
+SERVICE='StarMade.jar'
+OPTIONS='-server'
+**USERNAME='phrasz'** <----Change to your username!
+ScreenName='StarMade'
+**STARMADEPATH='/srv/starmade/StarMade'** <----you can run it out of /home/<your username>/StarMade as the simplest implementation
+
+#Server Run Settings
+HISTORY=1024
+MAXHEAP=1200
+MINHEAP=768
+INVOCATION="java -Xmx${MAXHEAP}M -Xms${MINHEAP}M -jar $SERVICE $OPTIONS"
+
+#Update Links/Names
+WEBSITE="http://files.star-made.org/"
+FILE="StarMade-Starter.jar"
+**JAVABINFOLDER="/opt/java/jdk1.7.0_25/bin" #no trailing / !**<----change you your Java path (aka run the command 'which  java')
+
+A Note on the Server's location
+-------------------------------
+As mentioned in the dependencies section: *'A folder named "StarMade" for server execution, with write permissions in its parent directory [FOR UPDATING ONLY!]*' is needed.
+For the self installing (yet to come), and updating to work you MUST have write permissions to the StarMade folder's parent.
+Therefore, if you run the server from ~/StarMade you should be fine, since you can write to your HOME working directory (~/ aka /home/<user name>/). 
+
+How to Install the Script for Auto-starting
+-------------------------------------------
+```bash
+sudo cp Starmade /etc/init.d/
+sudo update-rc.d Starmade defaults
+```
+
+How to Uninstall the Script
+---------------------------
+```bash
+sudo update-rc.d -f Starmade remove
+```
+
+Running the Script for the first time (Server Present)
+------------------------------------------------------
+If you already have a Server installed, with all of the config settings properly set you, and have installed the script with update-rc.d you can run:
+`sudo /etc/init.d/StarMade start`
+
+Updating
+--------
+You can easily update your server now:
+`sudo /etc/init.d/StarMade update`
+
+If you schedule this to occur in cron (`sudo crontab -e`) you now have Automatic Updating :D
+
+Running the Script for the first time (No Server)
+-------------------------------------------------
+If you run the update command on a server with NO StarMade it will actually self-install the whole StarMade server, due to how StarMade is updated and how I've built this script.
+
+License
+-------
+This script has been taken and modified from the MinecraftWiki.net Tutuorial on a Server Startup Script. 
+Link: http://www.minecraftwiki.net/wiki/Tutorials/Server_startup_script
+
+All items in this repository are distrubted under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 United States License ([CC BY-NC-SA 3.0 US](http://creativecommons.org/licenses/by-nc-sa/3.0/us/)).
+![CC BY-NC-SA](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png)
+
+Fin
+---
+Thanks for Reading!
+--phrasz
