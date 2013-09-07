@@ -112,7 +112,7 @@ A Note on the Server's location
 -------------------------------
 As mentioned in the dependencies section: *'A folder named "StarMade" for server execution, with write permissions in its parent directory [FOR UPDATING ONLY!]*' is needed.
 For the self installing (yet to come), and updating to work you MUST have write permissions to the StarMade folder's parent.
-Therefore, if you run the server from ~/StarMade you should be fine, since you can write to your HOME working directory (~/ aka /home/<user name>/). 
+Therefore, if you run the server from ~/StarMade you should be fine, since you can write to your HOME working directory (~/ aka /home/\<user name\>/). 
 
 How to Install the Script for Auto-starting
 -------------------------------------------
@@ -149,9 +149,10 @@ This script has been taken and modified from the MinecraftWiki.net Tutuorial on 
 Link: http://www.minecraftwiki.net/wiki/Tutorials/Server_startup_script
 
 All items in this repository are distrubted under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 United States License ([CC BY-NC-SA 3.0 US](http://creativecommons.org/licenses/by-nc-sa/3.0/us/)).
+
 ![CC BY-NC-SA](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png)
 
 Fin
 ---
-Thanks for Reading!
+>Thanks for Reading!
 --phrasz
